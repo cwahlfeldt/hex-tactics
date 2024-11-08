@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://ckugm0sb2yhry"]
+
+[ext_resource type="Script" path="res://src/Core/Debug/AStarDebugVisualizer.cs" id="1_khrkg"]
+
+[node name="AStarDebugVisualizer" type="Node3D"]
+script = ExtResource("1_khrkg")
