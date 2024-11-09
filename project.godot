@@ -21,3 +21,5 @@ project/assembly_name="Hex Tactics"
 [rendering]
 
 renderer/rendering_method="mobile"
+anti_aliasing/quality/msaa_3d=1
+anti_aliasing/quality/screen_space_aa=1

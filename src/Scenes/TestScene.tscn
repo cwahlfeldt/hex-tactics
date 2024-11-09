@@ -11,6 +11,7 @@ script = ExtResource("1_12cdt")
 
 [node name="HexGridManager" parent="." instance=ExtResource("2_1vb3v")]
 transform = Transform3D(1, 0, -1.11759e-08, 0, 1, 0, 3.72529e-09, -1.49012e-08, 1, 0, 0, 0)
+ShowDebugVisualizer = false
 
 [node name="Camera" type="Camera3D" parent="."]
 transform = Transform3D(0.984808, -0.150384, 0.0868241, 0, 0.5, 0.866026, -0.173648, -0.852868, 0.492404, 0.1, 9.5, 5.6)
@@ -18,8 +19,12 @@ projection = 1
 size = 20.0
 
 [node name="Floor" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.973403, 0)
 mesh = SubResource("PlaneMesh_y6les")
 
 [node name="DirectionalLight" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.657112, 0.753793, 0, -0.753793, 0.657112, 0, 0, 0)
+transform = Transform3D(0.69566, 0.296761, -0.65421, 0.71061, -0.150774, 0.687241, 0.105308, -0.942974, -0.315769, 0, 0, 0)
+shadow_enabled = true
+shadow_bias = 0.05
+shadow_opacity = 0.65
+shadow_blur = 1.295
