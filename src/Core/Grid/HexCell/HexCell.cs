@@ -1,27 +1,21 @@
 using Godot;
 using System.Collections.Generic;
-using HexTactics.Core.ECS;
-using HexTactics.Core.Pathfinding;
 
-namespace HexTactics.Entities.World
+
+namespace HexTactics.Core
 {
-    public partial class HexCell : Entity, IPathfindingNode
+    public partial class HexCell : Node3D
     {
         public int Index { get; set; }
         public Vector3I Coordinates { get; set; }
-        public List<HexCell> Neighbors { get; set; } = new();
         public bool IsTraversable { get; set; } = true;
-
-        // IPathfindingNode implementation
-        Vector3 IPathfindingNode.Position => GlobalPosition;
-        IEnumerable<IPathfindingNode> IPathfindingNode.Neighbors => Neighbors;
-
+        public List<HexCell> Neighbors { get; set; } = new();
+        public Unit Unit { get; set; }
         private MeshInstance3D _meshInstance;
         private StandardMaterial3D _material;
 
         public override void _Ready()
         {
-            base._Ready();
             SetupVisuals();
         }
 

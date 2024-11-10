@@ -3,7 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace HexTactics.Core.HexGrid
+namespace HexTactics.Core
 {
     public static class HexGrid
     {

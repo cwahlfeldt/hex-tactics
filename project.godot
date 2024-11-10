@@ -14,6 +14,11 @@ config/name="Hex Tactics"
 run/main_scene="res://src/Main.tscn"
 config/features=PackedStringArray("4.3", "C#", "Mobile")
 
+[autoload]
+
+HexGridManager="*res://src/Core/Game/HexGridManager.cs"
+TurnManager="*res://src/Core/Game/TurnManager.cs"
+
 [dotnet]
 
 project/assembly_name="Hex Tactics"

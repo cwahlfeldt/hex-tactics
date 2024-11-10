@@ -1,14 +1,15 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
-using HexTactics.Core.HexGrid;
 using HexTactics.Core.Debug;
 using HexTactics.Core.Pathfinding;
 
-namespace HexTactics.Entities.World.Managers
+namespace HexTactics.Core
 {
     public partial class HexGridManager : Node3D
     {
+        public static HexGridManager Instance { get; private set;}
+
         [Export] public int MapSize { get; set; } = 5;
         [Export] public float HexSize { get; set; } = 1.1f;
         [Export] public PackedScene HexScene { get; set; }
@@ -29,18 +30,21 @@ namespace HexTactics.Entities.World.Managers
             }
         }
 
-        private List<HexCell> _cells = new();
+        private readonly List<HexCell> _cells = new();
         private Node3D _gridContainer;
         private AStarDebugVisualizer _debugVisualizer;
         private Pathfinder _pathfinder;
 
-        private const string DEBUG_VISUALIZER_PATH = "res://src/Core/Debug/AStarDebugVisualizer.tscn";
+        private const string DEBUG_VISUALIZER_PATH = "res://src/Debug/AStarDebugVisualizer.tscn";
 
         public override void _Ready()
         {
             _pathfinder = new Pathfinder();
+
             SetupGridContainer();
             UpdateDebugVisualizer();
+
+            Instance = this;
         }
 
         private void SetupGridContainer()
@@ -187,6 +191,11 @@ namespace HexTactics.Entities.World.Managers
         {
             base._ExitTree();
             _debugVisualizer?.QueueFree();
+        }
+
+        public List<HexCell> GetGrid()
+        {
+            return _cells;
         }
 
         // Helper methods for pathfinding

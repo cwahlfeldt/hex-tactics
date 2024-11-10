@@ -1,9 +1,0 @@
-[gd_scene load_steps=3 format=3 uid="uid://m2w45qqyq6ib"]
-
-[ext_resource type="Script" path="res://src/Entities/World/Managers/HexGridManager.cs" id="1_kmn8q"]
-[ext_resource type="PackedScene" uid="uid://qfynmmf6yhop" path="res://src/Entities/World/HexCell/HexCell.tscn" id="2_721w1"]
-
-[node name="HexGridManager" type="Node3D"]
-script = ExtResource("1_kmn8q")
-HexScene = ExtResource("2_721w1")
-ShowDebugVisualizer = true

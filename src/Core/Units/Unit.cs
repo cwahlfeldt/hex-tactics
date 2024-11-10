@@ -1,13 +1,11 @@
 using Godot;
-using HexTactics.Core.ECS;
 using HexTactics.Core.Enums;
-using HexTactics.Entities.World;
 
-namespace HexTactics.Entities.Units
+namespace HexTactics.Core
 {
-    public partial class Unit : Entity
+    public partial class Unit : Node3D
     {
-        [Export] public int MoveRange { get; set; } = 2;
+        [Export] public int MoveRange { get; set; } = 1;
         [Export] public int AttackPower { get; set; } = 1;
         [Export] public int MaxHealth { get; set; } = 3;
 
@@ -18,7 +16,6 @@ namespace HexTactics.Entities.Units
 
         public override void _Ready()
         {
-            base._Ready();
             CurrentHealth = MaxHealth;
         }
 

@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbrwltn6nttux"]
+
+[ext_resource type="Script" path="res://src/Entities/Units/Player/Player.cs" id="1_8r7d7"]
+[ext_resource type="PackedScene" uid="uid://hbd8tqpi5koo" path="res://resources/models/player.glb" id="1_gcuyq"]
+[ext_resource type="Script" path="res://src/Components/HealthComponent.cs" id="3_f7dkc"]
+
+[node name="Player" type="Node3D"]
+script = ExtResource("1_8r7d7")
+
+[node name="Mesh" parent="." instance=ExtResource("1_gcuyq")]
+transform = Transform3D(1.735, 0, 0, 0, 1.735, 0, 0, 0, 1.735, 0, 0, 0)
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_f7dkc")

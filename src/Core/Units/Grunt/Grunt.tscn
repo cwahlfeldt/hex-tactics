@@ -1,8 +1,12 @@
-[gd_scene load_steps=2 format=3 uid="uid://b15sep0kg3820"]
+[gd_scene load_steps=3 format=3 uid="uid://b15sep0kg3820"]
 
 [ext_resource type="PackedScene" uid="uid://b30pirv11266s" path="res://resources/models/grunt.glb" id="1_1cwkx"]
+[ext_resource type="Script" path="res://src/Components/HealthComponent.cs" id="2_8hwue"]
 
 [node name="Grunt" type="Node3D"]
 
 [node name="Mesh" parent="." instance=ExtResource("1_1cwkx")]
 transform = Transform3D(0.345, 0, 0, 0, 0.345, 0, 0, 0, 0.345, 0, 0, 0)
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_8hwue")
