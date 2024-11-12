@@ -1,7 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
-namespace HexTactics.Core.Pathfinding
+namespace HexTactics.Core
 {
     // Interface for any node that can be pathfound through
     public interface IPathfindingNode

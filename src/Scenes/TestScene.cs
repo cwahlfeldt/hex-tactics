@@ -7,7 +7,7 @@ namespace HexTactics.Scenes
     {
         public override void _Ready()
         {
-            var grid = HexGridManager.GetGrid();
+            GameManager.Instance.Start();
         }
     }
 }

@@ -1,69 +1,47 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
-using HexTactics.Core.Debug;
-using HexTactics.Core.Pathfinding;
+using HexTactics.Utils.Debug;
 
 namespace HexTactics.Core
 {
-    public partial class HexGridManager : Node3D
+    public class HexGridManager
     {
-        public static HexGridManager Instance { get; private set;}
-
-        [Export] public int MapSize { get; set; } = 5;
-        [Export] public float HexSize { get; set; } = 1.1f;
-        [Export] public PackedScene HexScene { get; set; }
-
-        private bool _showDebugVisualizer;
-        [Export]
-        public bool ShowDebugVisualizer
-        {
-            get => _showDebugVisualizer;
-            set
-            {
-                _showDebugVisualizer = value;
-                UpdateDebugVisualizer();
-                if (_showDebugVisualizer && _debugVisualizer != null)
-                {
-                    VisualizePathfinding();
-                }
-            }
-        }
-
+        private float HexSize { get; set; } = 1.1f;
+        public readonly PackedScene HexScene = ResourceLoader.Load<PackedScene>("res://src/Core/Grid/HexCell/HexCell.tscn");
         private readonly List<HexCell> _cells = new();
         private Node3D _gridContainer;
         private AStarDebugVisualizer _debugVisualizer;
         private Pathfinder _pathfinder;
+        private readonly Dictionary<int, Label3D> _indexLabels = new();
+        private const string DEBUG_VISUALIZER_PATH = "res://src/Utils/Debug/AStarDebugVisualizer.tscn";
 
-        private const string DEBUG_VISUALIZER_PATH = "res://src/Debug/AStarDebugVisualizer.tscn";
-
-        public override void _Ready()
+        public HexGridManager()
         {
             _pathfinder = new Pathfinder();
+            Initialize();
+        }
 
+        private void Initialize()
+        {
             SetupGridContainer();
+            GenerateGrid();
+            GenerateNeighbors();
+            DisableRandomCells();
+            InitializePathfinding();
             UpdateDebugVisualizer();
-
-            Instance = this;
+            UpdateIndexLabels();
         }
 
         private void SetupGridContainer()
         {
-            _gridContainer = new Node3D { Name = "HexGridContainer" };
-            AddChild(_gridContainer);
-        }
-
-        public void Initialize()
-        {
-            Clear();
-            GenerateGrid();
-            GenerateNeighbors();
-            InitializePathfinding();
+            _gridContainer = new Node3D { Name = "HexGrid" };
+            GameManager.Instance.AddChild(_gridContainer);
         }
 
         private void GenerateGrid()
         {
-            var coordinates = HexGrid.GenerateHexCoordinates(MapSize);
+            var coordinates = HexGrid.GenerateHexCoordinates(GameManager.Instance.MapSize);
 
             for (int i = 0; i < coordinates.Count; i++)
             {
@@ -77,7 +55,7 @@ namespace HexTactics.Core
         private HexCell CreateHexCell(int index, Vector3I coord, Vector3 location)
         {
             var hex = HexScene.Instantiate<HexCell>();
-            hex.Name = $"Hex_{index}";
+            hex.Name = $"HexCell_{index}";
             hex.Index = index;
             hex.Coordinates = coord;
 
@@ -111,19 +89,88 @@ namespace HexTactics.Core
         {
             _pathfinder.Initialize(_cells);
 
-            if (_showDebugVisualizer && _debugVisualizer != null)
+            if (GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
             {
                 VisualizePathfinding();
             }
         }
 
+        public void DisableRandomCells()
+        {
+            if (GameManager.Instance.DisabledCells <= 0 || _cells.Count <= GameManager.Instance.DisabledCells) return;
+
+            // Get random cells without units
+            var cellsToDisable = _cells
+                .Where(cell => cell.Unit == null && cell.IsTraversable)
+                .Where(cell => cell.Index != GameManager.Instance.PlayerStartHexIndex) // Only select currently traversable cells without units
+                .OrderBy(x => GD.RandRange(0, 1.0f))
+                .Take(GameManager.Instance.DisabledCells)
+                .ToList();
+
+            foreach (var cell in cellsToDisable)
+            {
+                DisableCell(cell);
+            }
+        }
+
+        public void DisableCell(HexCell cell)
+        {
+            if (cell == null || !_cells.Contains(cell)) return;
+            cell.IsTraversable = false;
+        }
+
+        private void UpdateIndexLabels()
+        {
+            foreach (var label in _indexLabels.Values)
+            {
+                label.QueueFree();
+            }
+            _indexLabels.Clear();
+
+            if (!GameManager.Instance.ShowHexDebug) return;
+
+            foreach (var cell in _cells)
+            {
+                if (!cell.IsTraversable) continue;
+                var label = new Label3D
+                {
+                    Text = cell.Index.ToString(),
+                    Name = $"IndexLabel_{cell.Index}",
+                    Position = new Vector3(0, 0.45f, 0.2f),
+                    FontSize = 90,
+                    Modulate = Colors.Black,
+                    NoDepthTest = true,
+                };
+
+                label.Rotate(new Vector3(1, 0, 0), 30);
+
+                cell.AddChild(label);
+                _indexLabels[cell.Index] = label;
+            }
+        }
+
+        public void EnableCell(HexCell cell)
+        {
+            if (cell == null || !_cells.Contains(cell)) return;
+            cell.IsTraversable = true;
+        }
+
+        public void ResetAllCells()
+        {
+            foreach (var cell in _cells)
+            {
+                EnableCell(cell);
+            }
+            InitializePathfinding();
+        }
+
         private void UpdateDebugVisualizer()
         {
-            if (_showDebugVisualizer && _debugVisualizer == null)
+            if (GameManager.Instance.ShowPathDebug && _debugVisualizer == null)
             {
                 SetupDebugVisualizer();
             }
-            else if (!_showDebugVisualizer && _debugVisualizer != null)
+            else if (!GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
             {
                 _debugVisualizer.QueueFree();
                 _debugVisualizer = null;
@@ -138,18 +185,18 @@ namespace HexTactics.Core
                 if (visualizerScene != null)
                 {
                     _debugVisualizer = visualizerScene.Instantiate<AStarDebugVisualizer>();
-                    AddChild(_debugVisualizer);
+                    GameManager.Instance.AddChild(_debugVisualizer);
                 }
                 else
                 {
                     GD.PrintErr($"Failed to load AStarDebugVisualizer scene from {DEBUG_VISUALIZER_PATH}");
-                    _showDebugVisualizer = false;
+                    GameManager.Instance.ShowPathDebug = false;
                 }
             }
             catch (System.Exception e)
             {
                 GD.PrintErr($"Error loading debug visualizer: {e.Message}");
-                _showDebugVisualizer = false;
+                GameManager.Instance.ShowPathDebug = false;
             }
         }
 
@@ -163,8 +210,7 @@ namespace HexTactics.Core
 
                 if (astarField != null)
                 {
-                    var astar = astarField.GetValue(_pathfinder) as AStar3D;
-                    if (astar != null)
+                    if (astarField.GetValue(_pathfinder) is AStar3D astar)
                     {
                         _debugVisualizer.VisualizeAstar(astar);
                     }
@@ -187,12 +233,6 @@ namespace HexTactics.Core
             _debugVisualizer?.Clear();
         }
 
-        public override void _ExitTree()
-        {
-            base._ExitTree();
-            _debugVisualizer?.QueueFree();
-        }
-
         public List<HexCell> GetGrid()
         {
             return _cells;
@@ -201,18 +241,12 @@ namespace HexTactics.Core
         // Helper methods for pathfinding
         public List<HexCell> FindPath(HexCell from, HexCell to)
         {
-            return _pathfinder.FindPath(from.Index, to.Index)
-                .Select(node => node as HexCell)
-                .Where(cell => cell != null)
-                .ToList();
+            return _pathfinder.FindPath(from.Index, to.Index);
         }
 
         public List<HexCell> GetReachableNodes(HexCell start, int range)
         {
-            return _pathfinder.GetReachableNodes(start, range)
-                .Select(node => node as HexCell)
-                .Where(cell => cell != null)
-                .ToList();
+            return _pathfinder.GetReachableNodes(start, range);
         }
     }
 }

@@ -1,5 +1,4 @@
 using Godot;
-using HexTactics.Core.Enums;
 
 namespace HexTactics.Core
 {
@@ -12,10 +11,9 @@ namespace HexTactics.Core
         public HexCell CurrentHex { get; set; }
         public int CurrentHealth { get; private set; }
 
-        [Export] public UnitType Type { get; set; }
-
         public override void _Ready()
         {
+            AddToGroup("Unit");
             CurrentHealth = MaxHealth;
         }
 

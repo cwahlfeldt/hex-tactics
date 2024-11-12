@@ -1,14 +1,12 @@
 using Godot;
-using System.Collections.Generic;
 
-namespace HexTactics.Core.Debug
+namespace HexTactics.Utils.Debug
 {
-
 	public partial class AStarDebugVisualizer : Node3D
 	{
 		[ExportGroup("Visualization Settings")]
-		[Export] public float PointSize { get; set; } = 0.3f;
-		[Export] public float LineThickness { get; set; } = 0.05f;
+		[Export] public float PointSize { get; set; } = 0.2f;
+		[Export] public float LineThickness { get; set; } = 0.04f;
 		[Export] public Color ActiveColor { get; set; } = Colors.Blue;
 		[Export] public Color DisabledColor { get; set; } = Colors.Red;
 		[Export] public Color ConnectionColor { get; set; } = Colors.DarkCyan;
@@ -27,6 +25,7 @@ namespace HexTactics.Core.Debug
 			SetupMaterials();
 			SetupContainers();
 			CreateMeshes();
+			this.Position = new Vector3(0.035f, 0.5f, 0.28f);
 		}
 
 		private void SetupMaterials()

@@ -1,23 +1,24 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HexTactics.Core.Pathfinding
+namespace HexTactics.Core
 {
     public class Pathfinder
     {
         private readonly AStar3D _astar;
-        private readonly List<IPathfindingNode> _nodes;
+        private readonly List<HexCell> _nodes;
           private bool _initialized;
 
         public Pathfinder()
         {
             _astar = new AStar3D();
-            _nodes = new List<IPathfindingNode>();
+            _nodes = new List<HexCell>();
             _initialized = false;
         }
 
-        public void Initialize(IEnumerable<IPathfindingNode> nodes)
+        public void Initialize(IEnumerable<HexCell> nodes)
         {
             _nodes.Clear();
             _nodes.AddRange(nodes);
@@ -61,10 +62,10 @@ namespace HexTactics.Core.Pathfinding
             }
         }
 
-        public List<IPathfindingNode> FindPath(int fromIndex, int toIndex)
+        public List<HexCell> FindPath(int fromIndex, int toIndex)
         {
             if (!IsValidPath(fromIndex, toIndex))
-                return new List<IPathfindingNode>();
+                return new List<HexCell>();
 
             var pathPoints = _astar.GetPointPath(fromIndex, toIndex);
             return pathPoints.Select(point => 
@@ -74,14 +75,14 @@ namespace HexTactics.Core.Pathfinding
             ).ToList();
         }
 
-        public List<IPathfindingNode> GetReachableNodes(IPathfindingNode start, int range)
+        public List<HexCell> GetReachableNodes(HexCell start, int range)
         {
             if (!_initialized || !start.IsTraversable)
-                return new List<IPathfindingNode>();
+                return new List<HexCell>();
 
-            var reachable = new List<IPathfindingNode>();
+            var reachable = new List<HexCell>();
             var visited = new HashSet<int>();
-            var queue = new Queue<(IPathfindingNode node, int distance)>();
+            var queue = new Queue<(HexCell node, int distance)>();
             
             queue.Enqueue((start, 0));
             visited.Add(start.Index);
@@ -114,7 +115,7 @@ namespace HexTactics.Core.Pathfinding
                    _astar.HasPoint(toIndex);
         }
 
-        private IPathfindingNode FindNodeAtPosition(Vector3 position)
+        private HexCell FindNodeAtPosition(Vector3 position)
         {
             return _nodes.MinBy(n => position.DistanceTo(n.Position));
         }

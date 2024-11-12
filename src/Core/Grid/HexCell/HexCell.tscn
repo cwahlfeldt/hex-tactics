@@ -1,10 +1,9 @@
 [gd_scene load_steps=6 format=4 uid="uid://qfynmmf6yhop"]
 
-[ext_resource type="Script" path="res://src/Entities/World/HexCell/HexCell.cs" id="1_8v7gj"]
+[ext_resource type="Script" path="res://src/Core/Grid/HexCell/HexCell.cs" id="1_xcenb"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kb2gj"]
 resource_name = "Material.001"
-cull_mode = 2
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_i1koq"]
 _surfaces = [{
@@ -44,9 +43,9 @@ shadow_mesh = SubResource("ArrayMesh_i1koq")
 height = 0.7
 radius = 0.9
 
-[node name="HexCell" type="Node3D"]
+[node name="HexCell" type="Node3D" groups=["Hex"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.278557, 0)
-script = ExtResource("1_8v7gj")
+script = ExtResource("1_xcenb")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_vmrp5")

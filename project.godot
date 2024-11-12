@@ -16,12 +16,22 @@ config/features=PackedStringArray("4.3", "C#", "Mobile")
 
 [autoload]
 
-HexGridManager="*res://src/Core/Game/HexGridManager.cs"
-TurnManager="*res://src/Core/Game/TurnManager.cs"
+GameManager="*res://src/Core/Game/GameManager.cs"
+
+[display]
+
+window/size/always_on_top=true
 
 [dotnet]
 
 project/assembly_name="Hex Tactics"
+
+[global_group]
+
+Player="Should only contain the player "
+Enemy="All enemies"
+Hex="All hexes on the grid"
+Unit="Both players and enemies"
 
 [rendering]
 
