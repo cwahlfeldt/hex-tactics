@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.3", "C#", "Mobile")
 
 [autoload]
 
+SignalBus="*res://src/Core/SignalBus.cs"
 GameManager="*res://src/Core/Game/GameManager.cs"
 
 [display]
@@ -32,6 +33,14 @@ Player="Should only contain the player "
 Enemy="All enemies"
 Hex="All hexes on the grid"
 Unit="Both players and enemies"
+
+[input]
+
+LeftMouseClick={
+"deadzone": 0.5,
+"events": [Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"button_mask":0,"position":Vector2(0, 0),"global_position":Vector2(0, 0),"factor":1.0,"button_index":1,"canceled":false,"pressed":false,"double_click":false,"script":null)
+]
+}
 
 [rendering]
 

@@ -10,15 +10,14 @@ namespace HexTactics.Core
         private float HexSize { get; set; } = 1.1f;
         public readonly PackedScene HexScene = ResourceLoader.Load<PackedScene>("res://src/Core/Grid/HexCell/HexCell.tscn");
         private readonly List<HexCell> _cells = new();
-        private Node3D _gridContainer;
-        private AStarDebugVisualizer _debugVisualizer;
-        private Pathfinder _pathfinder;
+        private Node3D _gridContainer = new();
+        private AStarDebugVisualizer _debugVisualizer = new();
+        private readonly Pathfinder _pathfinder = new();
         private readonly Dictionary<int, Label3D> _indexLabels = new();
         private const string DEBUG_VISUALIZER_PATH = "res://src/Utils/Debug/AStarDebugVisualizer.tscn";
 
         public HexGridManager()
         {
-            _pathfinder = new Pathfinder();
             Initialize();
         }
 
@@ -237,6 +236,8 @@ namespace HexTactics.Core
         {
             return _cells;
         }
+
+        public HexCell GetCellByIndex(int index) => _cells[index];
 
         // Helper methods for pathfinding
         public List<HexCell> FindPath(HexCell from, HexCell to)

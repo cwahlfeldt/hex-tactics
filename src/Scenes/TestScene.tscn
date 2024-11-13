@@ -20,5 +20,7 @@ mesh = SubResource("PlaneMesh_y6les")
 [node name="DirectionalLight" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.693043, -0.0174077, -0.720686, 0.710697, -0.151063, 0.687088, -0.12083, -0.988371, -0.092322, 0, 0, 0)
 shadow_enabled = true
+shadow_normal_bias = 7.676
 shadow_transmittance_bias = -10.206
-shadow_blur = 3.077
+shadow_opacity = 0.41
+shadow_blur = 0.284

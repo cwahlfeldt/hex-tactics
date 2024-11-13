@@ -2,20 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dbq7hlpc5xcps"
-path.s3tc="res://.godot/imported/player_FieldFighter.png-9d823e35267c2f5e32bdc2a9c12c7bb8.s3tc.ctex"
+uid="uid://b051hn1v02g51"
+path.s3tc="res://.godot/imported/grunt_Image_6.png-d39eb7efb866eddc77bdff2f4648292e.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
 }
 generator_parameters={
-"md5": "ca51b2a35609be29ab9931de392b6de1"
+"md5": "061f2d9eab19fdac5df02244cca2479b"
 }
 
 [deps]
 
-source_file="res://resources/models/player_FieldFighter.png"
-dest_files=["res://.godot/imported/player_FieldFighter.png-9d823e35267c2f5e32bdc2a9c12c7bb8.s3tc.ctex"]
+source_file="res://resources/models/grunt_Image_6.png"
+dest_files=["res://.godot/imported/grunt_Image_6.png-d39eb7efb866eddc77bdff2f4648292e.s3tc.ctex"]
 
 [params]
 

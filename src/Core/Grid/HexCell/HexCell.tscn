@@ -43,16 +43,15 @@ shadow_mesh = SubResource("ArrayMesh_i1koq")
 height = 0.7
 radius = 0.9
 
-[node name="HexCell" type="Node3D" groups=["Hex"]]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.278557, 0)
+[node name="HexCell" type="Area3D" groups=["Hex"]]
 script = ExtResource("1_xcenb")
 
 [node name="Mesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("ArrayMesh_vmrp5")
 skeleton = NodePath("")
 
-[node name="Area3D" type="Area3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.341624, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Area3D"]
 shape = SubResource("CylinderShape3D_a62jo")
+
+[connection signal="input_event" from="." to="." method="OnInputEvent"]

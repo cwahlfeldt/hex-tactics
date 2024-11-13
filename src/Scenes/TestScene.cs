@@ -7,7 +7,7 @@ namespace HexTactics.Scenes
     {
         public override void _Ready()
         {
-            GameManager.Instance.Start();
+            GameManager.Instance.StartGame();
         }
     }
 }

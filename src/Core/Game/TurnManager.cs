@@ -15,7 +15,7 @@ namespace HexTactics.Core
         [Signal]
         public delegate void PhaseChangedEventHandler(string phase);
 
-        private readonly List<Unit> units = new();
+        private List<Unit> units = new();
         private int currentUnitIndex = 0;
         private TurnPhase currentPhase = TurnPhase.Idle;
 
@@ -31,28 +31,20 @@ namespace HexTactics.Core
             End
         }
 
-        public override void _Ready()
+        public TurnManager(List<Unit> _units)
         {
-            // Initialize turn system when the node is ready
-            InitializeTurnSystem();
-        }
-
-        private void InitializeTurnSystem()
-        {
-            // Get all players in the scene
-            var unitsInScene = GetTree().GetNodesInGroup("Unit").Cast<Unit>();
-            units.AddRange(unitsInScene);
+            units.AddRange(_units);
 
             if (!units.Any())
             {
-                GD.PrintErr("No players found in the scene!");
+                GD.PrintErr("No units found in the scene!");
                 return;
             }
 
-            StartNewTurn();
+            StartTurn();
         }
 
-        public void StartNewTurn()
+        public void StartTurn()
         {
             SetPhase(TurnPhase.Start);
             EmitSignal(SignalName.TurnStarted, CurrentUnit);
@@ -60,7 +52,7 @@ namespace HexTactics.Core
             SetPhase(TurnPhase.Action);
         }
 
-        public void EndCurrentTurn()
+        public void EndTurn()
         {
             SetPhase(TurnPhase.End);
             EmitSignal(SignalName.TurnEnded, CurrentUnit);
@@ -69,7 +61,7 @@ namespace HexTactics.Core
             currentUnitIndex = (currentUnitIndex + 1) % units.Count;
 
             // Start the next player's turn
-            StartNewTurn();
+            StartTurn();
         }
 
         private void SetPhase(TurnPhase newPhase)
