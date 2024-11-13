@@ -9,6 +9,7 @@ namespace HexTactics.Core
         [Export] public Vector3I Coordinates { get; set; }
         public List<HexCell> Neighbors { get; set; } = new();
         [Export] public Unit Unit { get; set; }
+        public bool IsUnitTurn = true;
         private MeshInstance3D _meshInstance;
         private StandardMaterial3D _material;
         private static readonly float _opacity = 0.8f;

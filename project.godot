@@ -17,6 +17,7 @@ config/features=PackedStringArray("4.3", "C#", "Mobile")
 [autoload]
 
 SignalBus="*res://src/Core/SignalBus.cs"
+AnimationManager="*res://src/Core/Game/AnimationManager.cs"
 GameManager="*res://src/Core/Game/GameManager.cs"
 
 [display]

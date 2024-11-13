@@ -9,7 +9,8 @@ namespace HexTactics.Core
     {
         private readonly AStar3D _astar;
         private readonly List<HexCell> _nodes;
-          private bool _initialized;
+        private bool _initialized;
+        public event Action OnPathfindingUpdated;
 
         public Pathfinder()
         {
@@ -22,19 +23,22 @@ namespace HexTactics.Core
         {
             _nodes.Clear();
             _nodes.AddRange(nodes);
-            
             SetupPathfinding();
             _initialized = true;
+            OnPathfindingUpdated?.Invoke();
         }
 
-        private void SetupPathfinding()
+        public void SetupPathfinding()
         {
+            _astar.Clear();
             AddPoints();
             ConnectPoints();
+            OnPathfindingUpdated?.Invoke();
         }
 
         private void AddPoints()
         {
+            _astar.Clear(); // Make sure we start fresh
             foreach (var node in _nodes)
             {
                 if (node.IsTraversable)
@@ -48,12 +52,14 @@ namespace HexTactics.Core
         {
             foreach (var node in _nodes)
             {
-                if (!node.IsTraversable)
+                // Skip if this node wasn't added to the graph
+                if (!_astar.HasPoint(node.Index))
                     continue;
 
                 foreach (var neighbor in node.Neighbors)
                 {
-                    if (_astar.HasPoint(neighbor.Index) && 
+                    // Only connect if both points exist in the graph
+                    if (_astar.HasPoint(neighbor.Index) &&
                         !_astar.ArePointsConnected(node.Index, neighbor.Index))
                     {
                         _astar.ConnectPoints(node.Index, neighbor.Index);
@@ -68,9 +74,9 @@ namespace HexTactics.Core
                 return new List<HexCell>();
 
             var pathPoints = _astar.GetPointPath(fromIndex, toIndex);
-            return pathPoints.Select(point => 
+            return pathPoints.Select(point =>
                 FindNodeAtPosition(point)
-            ).Where(node => 
+            ).Where(node =>
                 node != null
             ).ToList();
         }
@@ -83,7 +89,7 @@ namespace HexTactics.Core
             var reachable = new List<HexCell>();
             var visited = new HashSet<int>();
             var queue = new Queue<(HexCell node, int distance)>();
-            
+
             queue.Enqueue((start, 0));
             visited.Add(start.Index);
 
@@ -92,7 +98,7 @@ namespace HexTactics.Core
                 var (current, distance) = queue.Dequeue();
                 reachable.Add(current);
 
-                if (distance >= range) 
+                if (distance >= range)
                     continue;
 
                 foreach (var neighbor in current.Neighbors)
@@ -110,8 +116,8 @@ namespace HexTactics.Core
 
         private bool IsValidPath(int fromIndex, int toIndex)
         {
-            return _initialized && 
-                   _astar.HasPoint(fromIndex) && 
+            return _initialized &&
+                   _astar.HasPoint(fromIndex) &&
                    _astar.HasPoint(toIndex);
         }
 

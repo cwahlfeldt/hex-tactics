@@ -1,5 +1,7 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace HexTactics.Core
@@ -13,42 +15,25 @@ namespace HexTactics.Core
         private readonly Dictionary<Unit, HexCell> _unitPositions = new();
         private readonly Dictionary<HexCell, List<Unit>> _hexUnits = new();
 
-        public UnitManager(Dictionary<string, HexCell> UnitPositions) {
-            foreach (var unit in UnitPositions) {
-                if (unit.Key is "Player") {
-                    SpawnPlayer(unit.Value);
-                } else {
-                    SpawnEnemy(unit.Value);
-                }
-            }
-        }
-
         public Unit SpawnPlayer(HexCell hex)
         {
             _playerUnit = _playerScene.Instantiate<Unit>();
             GameManager.Instance.AddChild(_playerUnit); // Add to scene first
-
-            // Then set position and register
             _playerUnit.GlobalPosition = hex.GlobalPosition;
-            _playerUnit.CurrentHex = hex;
             RegisterUnit(_playerUnit, hex);
-
             return _playerUnit;
         }
 
-        public Unit SpawnEnemy(HexCell hex)
+        public Unit SpawnEnemy(HexCell hex, string type = "Grunt")
         {
-            var enemy = _enemyScene.Instantiate<Unit>();
-            GameManager.Instance.AddChild(enemy); // Add to scene first
-
-            // Then set position and register
+            var enemyScene = ResourceLoader.Load<PackedScene>($"res://src/Core/Units/{type}/{type}.tscn");
+            var enemy = enemyScene.Instantiate<Unit>();
+            GameManager.Instance.AddChild(enemy);
             enemy.GlobalPosition = hex.GlobalPosition;
-            enemy.CurrentHex = hex;
             RegisterUnit(enemy, hex);
-
             _enemyUnits.Add(enemy);
             enemy.Rotate(new Vector3(0, 1, 0), Mathf.DegToRad(180));
-            enemy.Name = $"Enemy_{_enemyUnits.Count}";
+            enemy.Name = $"{type}_{_enemyUnits.Count}";
 
             return enemy;
         }
@@ -65,12 +50,12 @@ namespace HexTactics.Core
                 }
 
                 _hexUnits[hex].Add(unit);
-                unit.CurrentHex = hex;
-                // Set position only if unit is in scene
+
                 if (unit.IsInsideTree())
                 {
                     unit.GlobalPosition = hex.GlobalPosition;
                 }
+                unit.CurrentHex = hex;
                 hex.Unit = unit;
             }
         }
@@ -85,6 +70,7 @@ namespace HexTactics.Core
                     _hexUnits.Remove(currentHex);
                 }
                 _unitPositions.Remove(unit);
+
                 unit.CurrentHex.Unit = null;
             }
         }
@@ -95,25 +81,22 @@ namespace HexTactics.Core
             unit.QueueFree();
         }
 
-        public void MoveUnit(Unit unit, HexCell toHex)
+        public void MoveUnit(Unit unit, HexCell toHex, Action OnUnitMoved = null)
         {
             var fromHex = unit.CurrentHex;
             if (fromHex == toHex) return;
 
-            var availableMoves = GameManager.Instance.HexGridManager.GetReachableNodes(fromHex, unit.MoveRange);
-            if (!availableMoves.Any())
-            {
-                // Emit turn end signal if needed
-                return;
-            }
+            var path = GameManager.Instance.HexGridManager.FindPath(fromHex, toHex, unit.MoveRange);
+            if (!path.Any())
+                GD.PrintErr("No path found for unit " + unit.Name);
 
-            var path = GameManager.Instance.HexGridManager.FindPath(fromHex, toHex);
-            UpdateUnitPosition(unit, fromHex, toHex);
-
-            // Handle movement animation
-            // You'll need to implement your animation system
             var locations = path.Select(h => h.GlobalPosition).ToList();
-            // AnimationManager.MoveThrough(unit, locations, OnUnitMoved);
+            AnimationManager.Instance.MoveThrough(unit, locations, () =>
+            {
+                UpdateUnitPosition(unit, fromHex, path.Last());
+                OnUnitMoved();
+                // GameManager.Instance.HexGridManager.UpdatePathfinding();
+            });
         }
 
         private void UpdateUnitPosition(Unit unit, HexCell fromHex, HexCell targetHex)
@@ -129,6 +112,11 @@ namespace HexTactics.Core
 
             _unitPositions[unit] = targetHex;
             unit.CurrentHex = targetHex;
+
+            // Update hex unit references
+            targetHex.Unit = unit;  // Changed from fromHex.Unit to just unit
+            fromHex.Unit = null;
+            // targetHex.IsUnitTurn = false;
 
             if (!_hexUnits.ContainsKey(targetHex))
             {
@@ -157,6 +145,8 @@ namespace HexTactics.Core
 
             return unitsInRange;
         }
+
+        public Unit GetPlayer() => _playerUnit;
 
         public List<Unit> GetEnemies() => _enemyUnits;
 

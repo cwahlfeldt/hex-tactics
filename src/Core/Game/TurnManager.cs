@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +28,7 @@ namespace HexTactics.Core
         {
             Idle,
             Start,
+            Move,
             Action,
             End
         }
@@ -40,8 +42,6 @@ namespace HexTactics.Core
                 GD.PrintErr("No units found in the scene!");
                 return;
             }
-
-            StartTurn();
         }
 
         public void StartTurn()
@@ -64,13 +64,20 @@ namespace HexTactics.Core
             StartTurn();
         }
 
-        private void SetPhase(TurnPhase newPhase)
+        public void SetPhase(TurnPhase newPhase)
         {
             currentPhase = newPhase;
             SignalBus.Instance.EmitSignal(SignalBus.SignalName.TurnChanged, CurrentUnit);
         }
 
+        public TurnPhase GetTurnPhase() => currentPhase;
+
         // Helper method to check if it's a specific player's turn
-        public bool IsPlayerTurn(Unit player) => CurrentUnit == player;
+        public bool IsPlayerTurn() => CurrentUnit.Name == GameManager.Instance.player.Name;
+
+        internal Unit GetCurrentUnit()
+        {
+            return CurrentUnit;
+        }
     }
 }

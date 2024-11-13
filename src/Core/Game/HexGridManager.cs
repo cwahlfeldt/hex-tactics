@@ -84,14 +84,22 @@ namespace HexTactics.Core
             }
         }
 
-        private void InitializePathfinding()
+        public void InitializePathfinding()
         {
             _pathfinder.Initialize(_cells);
 
             if (GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
             {
-                VisualizePathfinding();
+                _pathfinder.OnPathfindingUpdated += UpdateDebugVisualizer;
+                SetupDebugVisualizer();
             }
+        }
+
+        public List<HexCell> FindPath(HexCell from, HexCell to, int moveRange = 1)
+        {
+            var path = _pathfinder.FindPath(from.Index, to.Index).Take(moveRange + 1).ToList();
+
+            return path;
         }
 
         public void DisableRandomCells()
@@ -163,18 +171,13 @@ namespace HexTactics.Core
             InitializePathfinding();
         }
 
-        private void UpdateDebugVisualizer()
+    private void UpdateDebugVisualizer()
+    {
+        if (GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
         {
-            if (GameManager.Instance.ShowPathDebug && _debugVisualizer == null)
-            {
-                SetupDebugVisualizer();
-            }
-            else if (!GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
-            {
-                _debugVisualizer.QueueFree();
-                _debugVisualizer = null;
-            }
+            VisualizePathfinding();
         }
+    }
 
         private void SetupDebugVisualizer()
         {
@@ -221,6 +224,7 @@ namespace HexTactics.Core
             return _cells.FirstOrDefault(hex => hex.Coordinates == coord);
         }
 
+        // Update your Clear method to remove the event listener
         public void Clear()
         {
             foreach (var hex in _cells)
@@ -228,26 +232,18 @@ namespace HexTactics.Core
                 hex.QueueFree();
             }
             _cells.Clear();
-            _pathfinder?.Clear();
+            if (_pathfinder != null)
+            {
+                _pathfinder.OnPathfindingUpdated -= UpdateDebugVisualizer;
+                _pathfinder.Clear();
+            }
             _debugVisualizer?.Clear();
         }
 
-        public List<HexCell> GetGrid()
-        {
-            return _cells;
-        }
-
+        public void UpdatePathfinding() => _pathfinder.SetupPathfinding();
+        public Pathfinder GetPathfinder() => _pathfinder;
+        public List<HexCell> GetGrid() => _cells;
         public HexCell GetCellByIndex(int index) => _cells[index];
-
-        // Helper methods for pathfinding
-        public List<HexCell> FindPath(HexCell from, HexCell to)
-        {
-            return _pathfinder.FindPath(from.Index, to.Index);
-        }
-
-        public List<HexCell> GetReachableNodes(HexCell start, int range)
-        {
-            return _pathfinder.GetReachableNodes(start, range);
-        }
+        public List<HexCell> GetReachableNodes(HexCell start, int range) => _pathfinder.GetReachableNodes(start, range);
     }
 }
