@@ -1,20 +1,10 @@
 using Godot;
+using static HexTactics.Core.TurnManager;
 
 namespace HexTactics.Core
 {
 	public partial class SignalBus : Node
-	{
-		// enum SignalName
-		// {
-		// 	HexSelected,
-		// 	UnitMoved,
-		// 	TurnStarted,
-		// 	TurnChanged,
-		// 	TurnEnded,
-		// 	UnitAttack,
-		// 	GameStarted
-		// }
-		
+	{	
 		[Signal] public delegate void HexSelectedEventHandler(HexCell cell);
 		[Signal] public delegate void UnitMovedEventHandler(Unit unit);
 		[Signal] public delegate void TurnStartedEventHandler(Unit unit);

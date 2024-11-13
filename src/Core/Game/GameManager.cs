@@ -10,6 +10,8 @@ namespace HexTactics.Core
         public UnitManager UnitManager { get; private set; }
         public TurnManager TurnManager { get; private set; }
 
+        private HexCell selectedHex;
+
         [Export] public int MapSize { get; set; } = 5;
         [Export] public int PlayerStartHexIndex { get; set; } = 0;
         [Export] public int DisabledCells { get; set; } = 8;
@@ -19,9 +21,13 @@ namespace HexTactics.Core
         public override void _Ready()
         {
             SignalBus.Instance.HexSelected += OnHexSelected;
+            // SignalBus.Instance.GameStarted += OnGameStarted;
+            // SignalBus.Instance.UnitMoved += OnUnitMoved;
+            SignalBus.Instance.TurnStarted += OnTurnStarted;
+            // SignalBus.Instance.TurnEnded += OnTurnEnded;
 
             Instance = this;
-            
+
             PlayerStartHexIndex = MapSize + 2;
         }
 
@@ -41,13 +47,30 @@ namespace HexTactics.Core
 
         private void OnHexSelected(HexCell cell)
         {
-            if (cell == null) return;
-            GD.Print("Hex selected: " + cell.Index);
+            if (TurnManager == null) return;
+
+            selectedHex = cell;
+            var currentUnit = TurnManager.CurrentUnit;
+
+            if (TurnManager.IsPlayerTurn(currentUnit)) {
+                currentUnit.GlobalPosition = cell.GlobalPosition;
+                TurnManager.EndTurn();
+            }
+        }
+
+        private void OnTurnStarted(Unit unit)
+        {
+            if (TurnManager == null) return;
+            GD.Print(unit.Name, " turn started");
+            if (!(unit.Name == "Player")) {
+                unit.GlobalPosition = selectedHex.GlobalPosition;
+                TurnManager.EndTurn();
+            }
         }
 
         private void ClearCurrentGame()
         {
-            // HexGridManager?.Clear();
+            HexGridManager?.Clear();
             foreach (var child in GetChildren())
             {
                 child.QueueFree();

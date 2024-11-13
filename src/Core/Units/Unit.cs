@@ -7,7 +7,6 @@ namespace HexTactics.Core
         [Export] public int MoveRange { get; set; } = 1;
         [Export] public int AttackPower { get; set; } = 1;
         [Export] public int MaxHealth { get; set; } = 3;
-
         public HexCell CurrentHex { get; set; }
         public int CurrentHealth { get; private set; }
 

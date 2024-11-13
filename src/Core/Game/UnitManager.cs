@@ -71,6 +71,7 @@ namespace HexTactics.Core
                 {
                     unit.GlobalPosition = hex.GlobalPosition;
                 }
+                hex.Unit = unit;
             }
         }
 
@@ -84,7 +85,7 @@ namespace HexTactics.Core
                     _hexUnits.Remove(currentHex);
                 }
                 _unitPositions.Remove(unit);
-                // Emit signal if needed
+                unit.CurrentHex.Unit = null;
             }
         }
 

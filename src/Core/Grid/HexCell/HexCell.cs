@@ -5,10 +5,10 @@ namespace HexTactics.Core
 {
     public partial class HexCell : Area3D
     {
-        public int Index { get; set; }
-        public Vector3I Coordinates { get; set; }
+        [Export] public int Index { get; set; }
+        [Export] public Vector3I Coordinates { get; set; }
         public List<HexCell> Neighbors { get; set; } = new();
-        public Unit Unit { get; set; }
+        [Export] public Unit Unit { get; set; }
         private MeshInstance3D _meshInstance;
         private StandardMaterial3D _material;
         private static readonly float _opacity = 0.8f;

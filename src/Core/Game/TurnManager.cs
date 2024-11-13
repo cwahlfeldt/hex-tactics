@@ -47,7 +47,7 @@ namespace HexTactics.Core
         public void StartTurn()
         {
             SetPhase(TurnPhase.Start);
-            EmitSignal(SignalName.TurnStarted, CurrentUnit);
+            SignalBus.Instance.EmitSignal(SignalBus.SignalName.TurnStarted, CurrentUnit);
             // Auto-progress to main phase after start phase
             SetPhase(TurnPhase.Action);
         }
@@ -55,7 +55,7 @@ namespace HexTactics.Core
         public void EndTurn()
         {
             SetPhase(TurnPhase.End);
-            EmitSignal(SignalName.TurnEnded, CurrentUnit);
+            SignalBus.Instance.EmitSignal(SignalBus.SignalName.TurnEnded, CurrentUnit);
 
             // Move to next player
             currentUnitIndex = (currentUnitIndex + 1) % units.Count;
@@ -67,7 +67,7 @@ namespace HexTactics.Core
         private void SetPhase(TurnPhase newPhase)
         {
             currentPhase = newPhase;
-            EmitSignal(SignalName.PhaseChanged, nameof(CurrentPhase));
+            SignalBus.Instance.EmitSignal(SignalBus.SignalName.TurnChanged, CurrentUnit);
         }
 
         // Helper method to check if it's a specific player's turn
