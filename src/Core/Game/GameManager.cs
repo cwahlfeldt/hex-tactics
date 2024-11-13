@@ -14,7 +14,6 @@ namespace HexTactics.Core
         public UnitManager UnitManager { get; private set; }
         public TurnManager TurnManager { get; private set; }
         public Unit player;
-        public List<Unit> units = new();
         public HexCell selectedHex;
         public enum GameState
         {
@@ -37,7 +36,6 @@ namespace HexTactics.Core
             // SignalBus.Instance.UnitMoved += OnUnitMoved;
             SignalBus.Instance.TurnStarted += OnTurnStarted;
             // SignalBus.Instance.TurnEnded += OnTurnEnded;
-
             Instance = this;
             PlayerStartHexIndex = MapSize + 2;
         }
@@ -47,15 +45,10 @@ namespace HexTactics.Core
             ClearCurrentGame();
             HexGridManager = new HexGridManager();
             UnitManager = new UnitManager();
-
             player = UnitManager.SpawnPlayer(HexGridManager.GetGrid()[PlayerStartHexIndex]);
             UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 40], "Grunt");
-            units = UnitManager.GetAllUnits();
-            // UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 57], "Grunt");
-
+            UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 57], "Grunt");
             TurnManager = new TurnManager(UnitManager.GetAllUnits());
-
-            // HexGridManager.InitializePathfinding();
             TurnManager.StartTurn();
         }
 
@@ -163,7 +156,6 @@ namespace HexTactics.Core
 
         private void ClearCurrentGame()
         {
-            HexGridManager?.Clear();
             foreach (var child in GetChildren())
             {
                 child.QueueFree();
