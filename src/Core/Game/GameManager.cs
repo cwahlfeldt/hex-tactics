@@ -11,15 +11,15 @@ namespace HexTactics.Core
         public UnitManager UnitManager { get; private set; }
         public TurnManager TurnManager { get; private set; }
         public Unit player;
-        public HexCell selectedHex;
+        public HexCell selectedHex = null;
         private Dictionary<GameState, GameStateBase> states = new();
         private GameStateBase currentState;
 
         [Export] public int MapSize { get; set; } = 5;
         [Export] public int PlayerStartHexIndex { get; set; } = 0;
         [Export] public int DisabledCells { get; set; } = 8;
-        [Export] public bool ShowPathDebug { get; set; } = true;
-        [Export] public bool ShowHexDebug { get; set; } = false;
+        [Export] public bool ShowPathDebug { get; set; } = false;
+        [Export] public bool ShowHexDebug { get; set; } = true;
 
         public override void _Ready()
         {
@@ -35,22 +35,29 @@ namespace HexTactics.Core
         {
             ClearCurrentGame();
             HexGridManager = new HexGridManager();
+
             UnitManager = new UnitManager();
             player = UnitManager.SpawnPlayer(HexGridManager.GetGrid()[PlayerStartHexIndex]);
             UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 40], "Grunt");
-            UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 57], "Grunt");
+            // UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 57], "Grunt");
+
             TurnManager = new TurnManager(UnitManager.GetAllUnits());
+
+            SignalBus.Instance.EmitSignal(SignalBus.SignalName.GameStarted);
+
             TurnManager.StartTurn();
         }
+
+        public Unit GetCurrentUnit() => TurnManager.GetCurrentUnit();
 
         private void InitializeStateMachine()
         {
             states = new Dictionary<GameState, GameStateBase>
             {
-                { GameState.Start, new StartState() },
-                { GameState.Move, new MoveState() },
-                { GameState.Action, new ActionState() },
-                { GameState.End, new EndState() }
+                { GameState.Start,  new StartState(this) },
+                { GameState.Move,   new MoveState(this) },
+                { GameState.Action, new ActionState(this) },
+                { GameState.End,    new EndState(this) }
             };
         }
 
@@ -67,27 +74,21 @@ namespace HexTactics.Core
         {
             selectedHex = cell;
 
-            if (TurnManager.IsPlayerTurn())
+            if (TurnManager.IsPlayerTurn() && cell.Unit == null)
             {
-                ChangeState(GameState.Move);
+                ChangeState(GameState.Action);
             }
         }
 
         private void OnTurnStarted(Unit unit)
         {
-            foreach (HexCell neighbor in unit.CurrentHex.Neighbors)
-            {
-                neighbor.ClearHighlight();
-            }
             ChangeState(GameState.Start);
         }
 
         private void OnTurnEnded(Unit unit)
         {
-            foreach (HexCell neighbor in unit.CurrentHex.Neighbors)
-            {
-                neighbor.Highlight(Colors.Red);
-            }
+            // selectedHex = null;
+            return;
         }
 
         private void ClearCurrentGame()

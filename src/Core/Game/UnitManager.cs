@@ -9,11 +9,8 @@ namespace HexTactics.Core
     public partial class UnitManager
     {
         private readonly PackedScene _playerScene = ResourceLoader.Load<PackedScene>("res://src/Core/Units/Player/Player.tscn");
-        private readonly PackedScene _enemyScene = ResourceLoader.Load<PackedScene>("res://src/Core/Units/Grunt/Grunt.tscn");
         private Unit _playerUnit;
         private readonly List<Unit> _enemyUnits = new();
-        // private readonly Dictionary<Unit, HexCell> _unitPositions = new();
-        // private readonly Dictionary<HexCell, List<Unit>> _hexUnits = new();
 
         public Unit SpawnPlayer(HexCell hex)
         {
@@ -34,16 +31,11 @@ namespace HexTactics.Core
             _enemyUnits.Add(enemy);
             enemy.Rotate(new Vector3(0, 1, 0), Mathf.DegToRad(180));
             enemy.Name = $"{type}_{_enemyUnits.Count}";
-
             return enemy;
         }
 
         public static void RegisterUnit(Unit unit, HexCell hex)
         {
-            if (unit.IsInsideTree())
-            {
-                unit.GlobalPosition = hex.GlobalPosition;
-            }
             unit.CurrentHex = hex;
             hex.Unit = unit;
         }
@@ -73,6 +65,7 @@ namespace HexTactics.Core
             AnimationManager.Instance.MoveThrough(unit, locations, () =>
             {
                 UpdateUnitPosition(unit, fromHex, path.Last());
+                SignalBus.Instance.EmitSignal(SignalBus.SignalName.UnitMoved, unit);
                 OnUnitMoved();
             });
         }
@@ -83,6 +76,8 @@ namespace HexTactics.Core
             targetHex.Unit = unit;
             unit.CurrentHex = targetHex;
         }
+
+        public List<Unit> GetAllEnemies() => _enemyUnits;
 
         public List<Unit> GetAllUnits()
         {

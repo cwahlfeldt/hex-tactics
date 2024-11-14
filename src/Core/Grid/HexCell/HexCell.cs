@@ -46,7 +46,8 @@ namespace HexTactics.Core
 
         public void Highlight(Color color)
         {
-            SetColor(color, _opacity);
+            if (Unit == null)
+                SetColor(color, _opacity);
         }
 
         public void ClearHighlight()

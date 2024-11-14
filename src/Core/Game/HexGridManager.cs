@@ -2,6 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 using HexTactics.Utils.Debug;
+using System;
 
 namespace HexTactics.Core
 {
@@ -18,7 +19,19 @@ namespace HexTactics.Core
 
         public HexGridManager()
         {
+            SignalBus.Instance.GameStarted += OnGameStarted;
+            SignalBus.Instance.UnitMoved += OnUnitMoved;
             Initialize();
+        }
+
+        private void OnUnitMoved(Unit unit)
+        {
+            return;
+        }
+
+        private void OnGameStarted()
+        {
+            GD.Print("Calculate Ranges For units!!");
         }
 
         private void Initialize()
@@ -171,13 +184,13 @@ namespace HexTactics.Core
             InitializePathfinding();
         }
 
-    private void UpdateDebugVisualizer()
-    {
-        if (GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
+        private void UpdateDebugVisualizer()
         {
-            VisualizePathfinding();
+            if (GameManager.Instance.ShowPathDebug && _debugVisualizer != null)
+            {
+                VisualizePathfinding();
+            }
         }
-    }
 
         private void SetupDebugVisualizer()
         {
@@ -224,7 +237,6 @@ namespace HexTactics.Core
             return _cells.FirstOrDefault(hex => hex.Coordinates == coord);
         }
 
-        // Update your Clear method to remove the event listener
         public void Clear()
         {
             foreach (var hex in _cells)
@@ -238,6 +250,30 @@ namespace HexTactics.Core
                 _pathfinder.Clear();
             }
             _debugVisualizer?.Clear();
+        }
+
+        public HexCell FindTargetHex(HexCell fromHex, HexCell toHex, Unit unit)
+        {
+            var availableMoves = GetReachableNodes(fromHex, unit.MoveRange)
+                .Where(hex => hex.Unit == null)
+                .ToList();
+
+            if (!availableMoves.Any())
+            {
+                SignalBus.Instance.EmitSignal(SignalBus.SignalName.TurnEnded, unit);
+                return null;
+            }
+
+            var path = FindPath(fromHex, toHex);
+
+            if (path.Count > 1 && path.Count - 1 <= unit.MoveRange && path.Last().Unit == null)
+            {
+                return path.Last();
+            }
+
+            return availableMoves
+                .OrderBy(hex => HexGrid.GetDistance(hex.Coordinates, toHex.Coordinates))
+                .First();
         }
 
         public void UpdatePathfinding() => _pathfinder.SetupPathfinding();

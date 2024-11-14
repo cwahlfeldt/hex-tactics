@@ -1,5 +1,4 @@
 using Godot;
-using static HexTactics.Core.TurnManager;
 
 namespace HexTactics.Core
 {

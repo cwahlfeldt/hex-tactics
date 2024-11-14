@@ -11,7 +11,7 @@ namespace HexTactics.Core
     public enum UnitType
     {
         Player,
-        Enemy
+        Grunt
     }
 
     public enum RangeType 
