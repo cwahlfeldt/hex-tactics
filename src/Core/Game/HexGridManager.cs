@@ -25,8 +25,8 @@ namespace HexTactics.Core
         {
             SetupGridContainer();
             GenerateGrid();
-            GenerateNeighbors();
             DisableRandomCells();
+            GenerateNeighbors();
             InitializePathfinding();
             UpdateDebugVisualizer();
             UpdateIndexLabels();
@@ -74,7 +74,7 @@ namespace HexTactics.Core
                 foreach (var coord in neighborCoords)
                 {
                     var neighbor = FindHexByCoord(coord);
-                    if (neighbor != null)
+                    if (neighbor != null && neighbor.IsTraversable)
                     {
                         neighbors.Add(neighbor);
                     }

@@ -12,8 +12,8 @@ namespace HexTactics.Core
         private readonly PackedScene _enemyScene = ResourceLoader.Load<PackedScene>("res://src/Core/Units/Grunt/Grunt.tscn");
         private Unit _playerUnit;
         private readonly List<Unit> _enemyUnits = new();
-        private readonly Dictionary<Unit, HexCell> _unitPositions = new();
-        private readonly Dictionary<HexCell, List<Unit>> _hexUnits = new();
+        // private readonly Dictionary<Unit, HexCell> _unitPositions = new();
+        // private readonly Dictionary<HexCell, List<Unit>> _hexUnits = new();
 
         public Unit SpawnPlayer(HexCell hex)
         {
@@ -38,44 +38,23 @@ namespace HexTactics.Core
             return enemy;
         }
 
-        public void RegisterUnit(Unit unit, HexCell hex)
+        public static void RegisterUnit(Unit unit, HexCell hex)
         {
-            if (!_unitPositions.ContainsKey(unit))
+            if (unit.IsInsideTree())
             {
-                _unitPositions[unit] = hex;
-
-                if (!_hexUnits.ContainsKey(hex))
-                {
-                    _hexUnits[hex] = new List<Unit>();
-                }
-
-                _hexUnits[hex].Add(unit);
-
-                if (unit.IsInsideTree())
-                {
-                    unit.GlobalPosition = hex.GlobalPosition;
-                }
-                unit.CurrentHex = hex;
-                hex.Unit = unit;
+                unit.GlobalPosition = hex.GlobalPosition;
             }
+            unit.CurrentHex = hex;
+            hex.Unit = unit;
         }
 
-        public void UnregisterUnit(Unit unit)
+        public static void UnregisterUnit(Unit unit)
         {
-            if (_unitPositions.TryGetValue(unit, out HexCell currentHex))
-            {
-                _hexUnits[currentHex].Remove(unit);
-                if (!_hexUnits[currentHex].Any())
-                {
-                    _hexUnits.Remove(currentHex);
-                }
-                _unitPositions.Remove(unit);
-
-                unit.CurrentHex.Unit = null;
-            }
+            unit.CurrentHex.Unit = null;
+            unit.CurrentHex = null;
         }
 
-        public void RemoveUnit(Unit unit)
+        public static void RemoveUnit(Unit unit)
         {
             UnregisterUnit(unit);
             unit.QueueFree();
@@ -95,60 +74,15 @@ namespace HexTactics.Core
             {
                 UpdateUnitPosition(unit, fromHex, path.Last());
                 OnUnitMoved();
-                // GameManager.Instance.HexGridManager.UpdatePathfinding();
             });
         }
 
-        private void UpdateUnitPosition(Unit unit, HexCell fromHex, HexCell targetHex)
+        private static void UpdateUnitPosition(Unit unit, HexCell fromHex, HexCell targetHex)
         {
-            if (fromHex != null && _hexUnits.ContainsKey(fromHex))
-            {
-                _hexUnits[fromHex].Remove(unit);
-                if (!_hexUnits[fromHex].Any())
-                {
-                    _hexUnits.Remove(fromHex);
-                }
-            }
-
-            _unitPositions[unit] = targetHex;
-            unit.CurrentHex = targetHex;
-
-            // Update hex unit references
-            targetHex.Unit = unit;  // Changed from fromHex.Unit to just unit
             fromHex.Unit = null;
-            // targetHex.IsUnitTurn = false;
-
-            if (!_hexUnits.ContainsKey(targetHex))
-            {
-                _hexUnits[targetHex] = new List<Unit>();
-            }
-            _hexUnits[targetHex].Add(unit);
+            targetHex.Unit = unit;
+            unit.CurrentHex = targetHex;
         }
-
-        public bool HasUnits(HexCell hex) =>
-            _hexUnits.ContainsKey(hex) && _hexUnits[hex].Any();
-
-        public List<Unit> GetUnitsInAttackRange(Unit fromUnit, int attackRange)
-        {
-            var unitsInRange = new List<Unit>();
-            var fromHex = fromUnit.CurrentHex;
-
-            foreach (var kvp in _hexUnits)
-            {
-                var hex = kvp.Key;
-                // You'll need to implement hex distance calculation
-                if (HexGrid.GetDistance(fromHex.Coordinates, hex.Coordinates) <= attackRange)
-                {
-                    unitsInRange.AddRange(kvp.Value.Where(u => u != fromUnit));
-                }
-            }
-
-            return unitsInRange;
-        }
-
-        public Unit GetPlayer() => _playerUnit;
-
-        public List<Unit> GetEnemies() => _enemyUnits;
 
         public List<Unit> GetAllUnits()
         {
