@@ -4,6 +4,7 @@
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kb2gj"]
 resource_name = "Material.001"
+transparency = 1
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_i1koq"]
 _surfaces = [{
