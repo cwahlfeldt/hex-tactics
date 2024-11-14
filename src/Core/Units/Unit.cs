@@ -78,14 +78,8 @@ namespace HexTactics.Core
         }
 
         public int CurrentHealth { get; private set; }
-
-        // Change to HashSets for more efficient operations
-        private HashSet<HexCell> _attackRangeHexes = new();
-        private HashSet<HexCell> _moveRangeHexes = new();
-
-        // Public read-only access to ranges
-        public IReadOnlySet<HexCell> AttackRangeHexes => _attackRangeHexes;
-        public IReadOnlySet<HexCell> MoveRangeHexes => _moveRangeHexes;
+        public List<HexCell> MoveRangeHexes = new();
+        public List<HexCell> AttackRangeHexes = new();
 
         public override void _Ready()
         {
@@ -97,49 +91,26 @@ namespace HexTactics.Core
         {
             if (CurrentHex == null) return;
 
-            UpdateMoveRange();
-            UpdateAttackRange();
+            MoveRangeHexes = CurrentHex.Neighbors;
+            AttackRangeHexes = CurrentHex.Neighbors;
         }
 
-        private void UpdateMoveRange()
+        public List<Unit> GetUnitsInRange()
         {
-            _moveRangeHexes.Clear();
-
-            if (GameManager.Instance?.HexGridManager != null)
-            {
-                var reachableNodes = GameManager.Instance.HexGridManager
-                    .GetReachableNodes(CurrentHex, MoveRange);
-
-                foreach (var node in reachableNodes)
-                {
-                    _moveRangeHexes.Add(node);
-                }
-            }
+            return AttackRangeHexes
+                .Where(hex => hex.Unit != null && hex.Unit != this)
+                .Select(hex => hex.Unit)
+                .ToList();
         }
 
-        private void UpdateAttackRange()
+        public bool IsUnitInRange(Unit target)
         {
-            _attackRangeHexes.Clear();
+            return AttackRangeHexes.Any(hex => hex.Unit == target);
+        }
 
-            if (CurrentHex == null || !AttackRangeTypes.TryGetValue(AttackRange, out int range))
-                return;
-
-            var grid = GameManager.Instance?.HexGridManager?.GetGrid();
-            if (grid == null) return;
-
-            // Get all cells within attack range
-            for (int r = 1; r <= range; r++)
-            {
-                var ringCoords = HexGrid.GetRing(CurrentHex.Coordinates, r);
-                foreach (var coord in ringCoords)
-                {
-                    var cell = grid.FirstOrDefault(c => c.Coordinates == coord);
-                    if (cell != null && cell.IsTraversable)
-                    {
-                        _attackRangeHexes.Add(cell);
-                    }
-                }
-            }
+        public List<HexCell> GetOverlappingRange(List<HexCell> range)
+        {
+            return AttackRangeHexes.Intersect(range).ToList();
         }
 
         public virtual void TakeDamage(int amount)
@@ -150,16 +121,6 @@ namespace HexTactics.Core
                 QueueFree();
             }
         }
-
-        // Utility methods for range checking
-        public bool IsInAttackRange(HexCell cell) => _attackRangeHexes.Contains(cell);
-        public bool IsInMoveRange(HexCell cell) => _moveRangeHexes.Contains(cell);
-
-        public bool CanAttack(Unit target) =>
-            target != null &&
-            target != this &&
-            target.CurrentHex != null &&
-            IsInAttackRange(target.CurrentHex);
 
         public void ShowMoveRange(Color color)
         {

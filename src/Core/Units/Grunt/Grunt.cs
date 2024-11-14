@@ -5,6 +5,7 @@ namespace HexTactics.Core.Grunt
         public override void _Ready()
         {
             UnitType = UnitType.Grunt;
+            MaxHealth = 1;
             AddToGroup("Enemy");
         }
     }

@@ -29,7 +29,6 @@ namespace HexTactics.Core
         {
             if (selectedHex != null && selectedHex.Unit == null)
             {
-                GD.Print($"selectedHex Unit is {selectedHex?.Unit?.Name}");
                 selectedHex.Highlight(Colors.Aqua);
                 GameManager.UnitManager.MoveUnit(player, selectedHex, () =>
                 {

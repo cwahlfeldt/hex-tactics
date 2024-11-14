@@ -63,7 +63,7 @@ namespace HexTactics.Core
 
         public void ChangeState(GameState newState)
         {
-            GD.Print($"{TurnManager.CurrentUnit.Name}: {newState}");
+            // GD.Print($"{TurnManager.CurrentUnit.Name}: {newState}");
 
             currentState?.Exit();
             currentState = states[newState];

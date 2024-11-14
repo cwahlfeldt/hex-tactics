@@ -20,19 +20,27 @@ namespace HexTactics.Core
                 EnemyAction(currentUnit);
         }
 
-        private void PlayerAction(Unit player, HexCell selectedHex)
+        private async void PlayerAction(Unit player, HexCell selectedHex)
         {
             if (selectedHex != null)
             {
-                var enemies = GameManager.UnitManager.GetAllEnemies();
-                foreach (var enemy in enemies)
+                var unitsInRange = player.GetUnitsInRange();
+                var attackableHexes = new List<HexCell>();
+                foreach (var unit in unitsInRange)
                 {
-                    if (player.CanAttack(enemy))
+                    var overlappingRanges = player.GetOverlappingRange(unit.AttackRangeHexes);
+                    foreach (var range in overlappingRanges)
                     {
-                        GD.Print("Can attack");
+                        attackableHexes.Add(range);
                     }
                 }
                 GameManager.ChangeState(GameState.Move);
+                if (attackableHexes.Contains(selectedHex))
+                {
+                    await Task.Delay(TimeSpan.FromMilliseconds(300));
+                    unitsInRange[0].TakeDamage(player.AttackPower);
+                }
+                
             }
         }
 
