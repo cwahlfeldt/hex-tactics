@@ -2,7 +2,6 @@ using Godot;
 using System.Collections.Generic;
 using System.Linq;
 using HexTactics.Utils.Debug;
-using System;
 
 namespace HexTactics.Core
 {

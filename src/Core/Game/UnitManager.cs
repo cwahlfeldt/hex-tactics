@@ -15,7 +15,7 @@ namespace HexTactics.Core
         public Unit SpawnPlayer(HexCell hex)
         {
             _playerUnit = _playerScene.Instantiate<Unit>();
-            GameManager.Instance.AddChild(_playerUnit); // Add to scene first
+            GameManager.Instance.AddChild(_playerUnit);
             _playerUnit.GlobalPosition = hex.GlobalPosition;
             RegisterUnit(_playerUnit, hex);
             return _playerUnit;

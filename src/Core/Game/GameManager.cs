@@ -39,7 +39,7 @@ namespace HexTactics.Core
             UnitManager = new UnitManager();
             player = UnitManager.SpawnPlayer(HexGridManager.GetGrid()[PlayerStartHexIndex]);
             UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 40], "Grunt");
-            // UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 57], "Grunt");
+            UnitManager.SpawnEnemy(HexGridManager.GetGrid()[PlayerStartHexIndex + 57], "Grunt");
 
             TurnManager = new TurnManager(UnitManager.GetAllUnits());
 
@@ -63,7 +63,7 @@ namespace HexTactics.Core
 
         public void ChangeState(GameState newState)
         {
-            // GD.Print($"{TurnManager.CurrentUnit.Name}: {newState}");
+            GD.Print($"{TurnManager.CurrentUnit.Name}: {newState}");
 
             currentState?.Exit();
             currentState = states[newState];

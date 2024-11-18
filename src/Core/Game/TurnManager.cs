@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -48,7 +47,6 @@ namespace HexTactics.Core
         {
             SetPhase(TurnPhase.Start);
             SignalBus.Instance.EmitSignal(SignalBus.SignalName.TurnStarted, CurrentUnit);
-            // Auto-progress to main phase after start phase
             SetPhase(TurnPhase.Action);
         }
 
