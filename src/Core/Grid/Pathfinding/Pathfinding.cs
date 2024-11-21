@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace HexTactics.Core
 {
-    public class Pathfinder
+    public class PathFinder
     {
         private readonly AStar3D _astar;
         private readonly List<HexCell> _nodes;
         private bool _initialized;
         public event Action OnPathfindingUpdated;
 
-        public Pathfinder()
+        public PathFinder()
         {
             _astar = new AStar3D();
             _nodes = new List<HexCell>();

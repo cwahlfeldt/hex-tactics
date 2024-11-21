@@ -12,7 +12,7 @@ namespace HexTactics.Core
         private readonly List<HexCell> _cells = new();
         private Node3D _gridContainer = new();
         private AStarDebugVisualizer _debugVisualizer = new();
-        private readonly Pathfinder _pathfinder = new();
+        private readonly PathFinder _pathfinder = new();
         private readonly Dictionary<int, Label3D> _indexLabels = new();
         private const string DEBUG_VISUALIZER_PATH = "res://src/Utils/Debug/AStarDebugVisualizer.tscn";
 
@@ -218,7 +218,7 @@ namespace HexTactics.Core
         {
             if (_debugVisualizer != null && _pathfinder != null)
             {
-                var astarField = typeof(Pathfinder).GetField("_astar",
+                var astarField = typeof(PathFinder).GetField("_astar",
                     System.Reflection.BindingFlags.NonPublic |
                     System.Reflection.BindingFlags.Instance);
 
@@ -276,7 +276,7 @@ namespace HexTactics.Core
         }
 
         public void UpdatePathfinding() => _pathfinder.SetupPathfinding();
-        public Pathfinder GetPathfinder() => _pathfinder;
+        public PathFinder GetPathfinder() => _pathfinder;
         public List<HexCell> GetGrid() => _cells;
         public HexCell GetCellByIndex(int index) => _cells[index];
         public List<HexCell> GetReachableNodes(HexCell start, int range) => _pathfinder.GetReachableNodes(start, range);
