@@ -26,6 +26,7 @@ namespace HexTactics.Core
             {
                 var unitsInRange = player.GetUnitsInRange();
                 var attackableHexes = new List<HexCell>();
+
                 foreach (var unit in unitsInRange)
                 {
                     var overlappingRanges = player.GetOverlappingRange(unit.AttackRangeHexes);
@@ -34,13 +35,13 @@ namespace HexTactics.Core
                         attackableHexes.Add(range);
                     }
                 }
+                
                 GameManager.ChangeState(GameState.Move);
                 if (attackableHexes.Contains(selectedHex))
                 {
                     await Task.Delay(TimeSpan.FromMilliseconds(300));
                     unitsInRange[0].TakeDamage(player.AttackPower);
                 }
-                
             }
         }
 
